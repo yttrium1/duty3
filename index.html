@@ -208,6 +208,14 @@
         });
       });
 
+     // 新たに追加するイベントリスナーの設定をここに挿入
+      document.querySelectorAll('.date').forEach(function(date) {
+        date.addEventListener('click', function() {
+          this.classList.toggle('bg-yellow-300');
+      // この行で、クリックされた要素に 'bg-yellow-300' クラスがあれば削除し、なければ追加します。
+    });
+  });
+
       const generateUrlButton = document.getElementById('generate-url');
       generateUrlButton.addEventListener('click', function() {
   const nameSelect = document.getElementById('name-select');
