@@ -135,7 +135,13 @@
 
           // Add day cells to the calendar
           for (let i = 1; i <= daysInMonth; i++) {
+            let date = new Date(month.getFullYear(), month.getMonth(), i);
+            let dayOfWeek = date.getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 6) { // 土日の場合
+              grid.innerHTML += `<div class="date duty">${i}当</div><div class="date day">${i}日</div>`;
+            } else { // 平日の場合
             grid.innerHTML += `<div class="date">${i}</div>`;
+            }
           }
 
           // Re-add event listeners to new date elements
@@ -180,8 +186,9 @@
   }
 
   const comment = document.querySelector('#comment-input').value;
-  const preferredDates = Array.from(document.querySelectorAll('.preferred .date.bg-yellow-300')).map(el => el.textContent.trim());
-  const notPreferredDates = Array.from(document.querySelectorAll('.not-preferred .date.bg-yellow-300')).map(el => el.textContent.trim());
+  const preferredDates = Array.from(document.querySelectorAll('.preferred .date.bg-yellow-300')).map(el => el.textContent.trim().replace(/当|日/g, match => ` ${match}`));
+  const notPreferredDates = Array.from(document.querySelectorAll('.not-preferred .date.bg-yellow-300')).map(el => el.textContent.trim().replace(/当|日/g, match => ` ${match}`));
+
   
   const summary = `回答者の名前: ${name}\n希望日: ${preferredDates.join(', ')}\n希望しない日: ${notPreferredDates.join(', ')}\nコメント: ${comment}`;
   const email = 'rosai041321@gmail.com';
