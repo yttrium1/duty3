@@ -78,7 +78,11 @@
     .date-cell {
       display: flex;
       justify-content: space-around;
-      flex: 1 0 14%; /* 各グリッドセルがコンテナの幅の14%を取るように設定 */
+      flex: 2 0 28%; /* 平日の2倍の幅 */
+      margin: 0 1%; /* 余白を調整 */
+    }
+    .weekend {
+      flex: 2 0 28%; /* 平日の2倍の幅 */
     }
     .duty, .day {
       flex: 1 0 7%; /* これにより、これらの要素は日付の半分の幅を取る */
@@ -153,19 +157,18 @@
             grid.innerHTML += '<div></div>';
           }
 
-          // Add day cells to the calendar, including special markers for weekends
+          // Add day cells to the calendar
           for (let i = 1; i <= daysInMonth; i++) {
             let date = new Date(month.getFullYear(), month.getMonth(), i);
             let dayOfWeek = date.getDay();
             if (dayOfWeek === 0 || dayOfWeek === 6) { // 土日の場合
-              // Wrapping both "duty" and "day" inside "date-cell" container
               grid.innerHTML += `
-                <div class="date-cell">
+                <div class="date-cell weekend">
                   <div class="date duty">${i}当</div>
-                <div class="date day">${i}日</div>
+                  <div class="date day">${i}日</div>
                 </div>`;
             } else { // 平日の場合
-              grid.innerHTML += `<div class="date">${i}</div>`;
+              grid.innerHTML += `<div class="date-cell"><div class="date">${i}</div></div>`;
             }
           }
 
