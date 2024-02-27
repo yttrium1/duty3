@@ -1,3 +1,4 @@
+日当直別
 <html>
 <head>
   <meta charset="UTF-8">
@@ -29,10 +30,29 @@
   background-color: white; /* 背景色を白に設定 */
   box-shadow: 0 0 10px rgba(0,0,0,0.1); /* シャドウを追加して立体感を出す */
 }
+    <style>
+  /* 他のスタイル定義 */
+
+  .date:hover {
+    cursor: pointer;
+    background-color: #fbd38d; /* PCでのホバー時の背景色 */
+  }
+
+  /* PC用のスタイル */
+  @media (min-width: 769px) {
     .date:hover {
-      cursor: pointer;
-      background-color: #fbd38d;
+      background-color: #fbd38d; /* ホバー時の背景色 */
     }
+  }
+
+  /* モバイルデバイス用のスタイル */
+  @media (max-width: 768px) {
+    .date:hover {
+      background-color: initial; /* モバイルではホバー時の背景色を変更しない */
+    }
+  }
+
+
     .calendar-day {
       font-weight: bold;
       text-align: center;
@@ -78,11 +98,7 @@
     .date-cell {
       display: flex;
       justify-content: space-around;
-      flex: 2 0 28%; /* 平日の2倍の幅 */
-      margin: 0 1%; /* 余白を調整 */
-    }
-    .weekend {
-      flex: 2 0 28%; /* 平日の2倍の幅 */
+      flex: 1 0 14%; /* 各グリッドセルがコンテナの幅の14%を取るように設定 */
     }
     .duty, .day {
       flex: 1 0 7%; /* これにより、これらの要素は日付の半分の幅を取る */
@@ -90,10 +106,6 @@
       justify-content: center;
       align-items: center;
       margin: 2px; /* 余白を適切に設定 */
-    }
- 
-</style>
-
   /* その他必要なスタイルがあれば追加 */
     }
     
@@ -161,18 +173,19 @@
             grid.innerHTML += '<div></div>';
           }
 
-          // Add day cells to the calendar
+          // Add day cells to the calendar, including special markers for weekends
           for (let i = 1; i <= daysInMonth; i++) {
             let date = new Date(month.getFullYear(), month.getMonth(), i);
             let dayOfWeek = date.getDay();
             if (dayOfWeek === 0 || dayOfWeek === 6) { // 土日の場合
+              // Wrapping both "duty" and "day" inside "date-cell" container
               grid.innerHTML += `
-                <div class="date-cell weekend">
+                <div class="date-cell">
                   <div class="date duty">${i}当</div>
-                  <div class="date day">${i}日</div>
+                <div class="date day">${i}日</div>
                 </div>`;
             } else { // 平日の場合
-              grid.innerHTML += `<div class="date-cell"><div class="date">${i}</div></div>`;
+              grid.innerHTML += `<div class="date">${i}</div>`;
             }
           }
 
