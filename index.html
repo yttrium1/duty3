@@ -70,12 +70,27 @@
       justify-content: center;
       align-items: center;
       text-align: center;
+      flex: 1 0 14%; /* 各日付がコンテナの幅の14%を取るように設定 */
+      transition: background-color 0.3s ease; /* ホバーエフェクトの滑らかな変化 */
+    /* 余白が必要な場合はmarginをここに追加 */
     }
+
+    .duty, .day {
+      flex: 1 0 7%; /* これにより、これらの要素は日付の半分の幅を取る */
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      margin: 2px; /* 余白を適切に設定 */
+  /* その他必要なスタイルがあれば追加 */
+    }
+    
     .calendar-grid {
+      display: flex; /* Flexコンテナとして指定 */
+      flex-wrap: wrap; /* 要素を折り返すように指定 */
+      justify-content: space-between; /* 要素の間にスペースを均等に配置 */
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       border: 1px solid #ccc;
     }
-
     .date {
       transition: background-color 0.3s ease; /* ホバーエフェクトの滑らかな変化 */
     }
