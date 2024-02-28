@@ -154,20 +154,21 @@
           }
 
           // Add day cells to the calendar, including special markers for weekends
-          for (let i = 1; i <= daysInMonth; i++) {
-            let date = new Date(month.getFullYear(), month.getMonth(), i);
-            let dayOfWeek = date.getDay();
-            if (dayOfWeek === 0 || dayOfWeek === 6) { // 土日の場合
-              // Wrapping both "duty" and "day" inside "date-cell" container
-              grid.innerHTML += `
-                <div class="date-cell">
-                  <div class="date duty">${i}当</div>
-                <div class="date day">${i}日</div>
-                </div>`;
-            } else { // 平日の場合
-              grid.innerHTML += `<div class="date">${i}</div>`;
-            }
-          }
+           for (let i = 1; i <= daysInMonth; i++) {
+        let date = new Date(month.getFullYear(), month.getMonth(), i);
+        let dayOfWeek = date.getDay();
+        let isSpecialDate = date.getFullYear() === 2024 && date.getMonth() === 3 && date.getDate() === 29; // 月は0から始まるため、3は4月を意味する
+  
+        if (dayOfWeek === 0 || dayOfWeek === 6 || isSpecialDate) {
+          grid.innerHTML += `
+            <div class="date-cell">
+              <div class="date duty">${i}当</div>
+              <div class="date day">${i}日</div>
+            </div>`;
+        } else {
+          grid.innerHTML += `<div class="date">${i}</div>`;
+        }
+      }
 
           // Re-add event listeners to all date elements including "当" and "日"
           grid.querySelectorAll('.date, .duty, .day').forEach(date => {
