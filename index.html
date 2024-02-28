@@ -154,10 +154,17 @@
           }
 
           // Add day cells to the calendar, including special markers for weekends
-           for (let i = 1; i <= daysInMonth; i++) {
-        let date = new Date(month.getFullYear(), month.getMonth(), i);
-        let dayOfWeek = date.getDay();
-        let isSpecialDate = date.getFullYear() === 2024 && date.getMonth() === 3 && date.getDate() === 29; // 月は0から始まるため、3は4月を意味する
+          const isHoliday = (date) => {
+            const month = date.getMonth() + 1; // JSでは月が0から始まるため調整
+            const day = date.getDate();
+            const dateString = `${date.getFullYear()}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            return holidays2024.includes(dateString);
+          };
+                    
+          for (let i = 1; i <= daysInMonth; i++) {
+            let date = new Date(month.getFullYear(), month.getMonth(), i);
+            let dayOfWeek = date.getDay();
+            let isSpecialDate = isHoliday(date);
   
         if (dayOfWeek === 0 || dayOfWeek === 6 || isSpecialDate) {
           grid.innerHTML += `
