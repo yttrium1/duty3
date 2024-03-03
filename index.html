@@ -105,27 +105,27 @@
   position: relative;
   padding: 10px 20px;
   border-radius: 7px;
-  border: 1px solid #68d391; /* 枠の色も#68d391に合わせて変更 */
+  border: 1px solid rgb(61, 106, 255); /* 枠の色 */
   font-size: 14px;
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 2px;
-  background: #68d391; /* デフォルトの背景色を#68d391に変更 */
+  background: rgb(61, 106, 255); /* デフォルトの背景色を青に */
   color: #fff; /* デフォルトの文字色は白 */
   overflow: hidden;
-  box-shadow: 0 0 15px 5px rgba(104, 211, 145, 0.9); /* 緑色に合うシャドウに調整 */
+  box-shadow: 0 0 30px 5px rgba(0, 142, 236, 0.815); /* デフォルト状態でのシャドウ */
   transition: all 0.2s ease-in-out;
 }
 
- #generate-url:hover {
+#generate-url:hover {
   background: transparent; /* ホバー時の背景を透明に */
-  color: #68d391; /* ホバー時の文字色を#68d391に（背景が透明なので見えるように） */
+  color: rgb(61, 106, 255); /* ホバー時の文字色を青に（背景が透明なので見えるように） */
   box-shadow: 0 0 0 0 transparent; /* ホバー時のシャドウを削除 */
 }
-      
-#generate-url:hover::before {
-animation: none; /* ホバー時のアニメーションを無効化（必要に応じて） */}
 
+#generate-url:hover::before {
+  animation: none; /* ホバー時のアニメーションを無効化（必要に応じて） */
+}
 #generate-url::before {
  content: '';
   display: block;
