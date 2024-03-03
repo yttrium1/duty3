@@ -103,17 +103,7 @@
     }
     
     #generate-url {
-      display: inline-block;
-      background-color: #7B68EE
-      color: white;
-      font-weight: bold;
-      padding: 8px 16px;
-      border-radius: 9999px;
-      margin-bottom: 8px;
-    }
-
-    #special-button {
-  position: relative;
+ position: relative;
   padding: 10px 20px;
   border-radius: 7px;
   border: 1px solid rgb(61, 106, 255);
@@ -129,20 +119,20 @@
   -moz-transition: all 0.2s ease-in;
   transition: all 0.2s ease-in;
 }
-#special-button:hover {
+#generate-url:hover {
 background: rgb(61, 106, 255);
   box-shadow: 0 0 30px 5px rgba(0, 142, 236, 0.815);
   -webkit-transition: all 0.2s ease-out;
   -moz-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;}
 
-#special-button:hover::before {
+#generate-url:hover::before {
    -webkit-animation: sh02 0.5s 0s linear;
   -moz-animation: sh02 0.5s 0s linear;
   animation: sh02 0.5s 0s linear;
 }
 
-#special-button::before {
+#generate-url::before {
  content: '';
   display: block;
   width: 0px;
@@ -159,7 +149,7 @@ background: rgb(61, 106, 255);
   -o-transform: skewX(-20deg);
   transform: skewX(-20deg);}
 
-@keyframes special-sh02 {
+@keyframes  {
   from {
     opacity: 0;
     left: 0%;
@@ -175,7 +165,7 @@ background: rgb(61, 106, 255);
   }
 }
 
-#special-button:active {
+#generate-url:active {
 box-shadow: 0 0 0 0 transparent;
   -webkit-transition: box-shadow 0.2s ease-in;
   -moz-transition: box-shadow 0.2s ease-in;
@@ -460,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <input type="email" id="email-input" name="email" placeholder="your.email@example.com" class="mt-1 p-2 border border-gray-300 rounded w-full">
     </div>
     <div>
-      <button id="special-button" class="bg-green-600 text-white font-bold py-2 px-4 rounded-full">送信する</button>
+      <button id="generate-url" class="bg-green-600 text-white font-bold py-2 px-4 rounded-full">送信する</button>
             <p class="text-gray-700 text-sm mt-2">（ボタンを押した後，完了まで数秒かかります．）</p>
     </div>
   </div>
