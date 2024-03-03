@@ -66,15 +66,16 @@
       margin-bottom: 8px;
     }
     .date {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      flex: 1 0 4%; /* 各日付がコンテナの幅の14%を取るように設定 */
-      transition: background-color 0.3s ease; /* ホバーエフェクトの滑らかな変化 */
-      border: 1px solid #bbb; /* 境界線を追加 */
-    /* 余白が必要な場合はmarginをここに追加 */
-    }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex: 1 0 auto; /* flex-basisをautoに設定して、内容に基づく幅を持たせる */
+  padding: 8px; /* 内部の余白を調整 */
+  margin: 2px; /* 要素の外側に余白を追加 */
+  border: 1px solid #bbb; /* 境界線を追加 */
+  transition: background-color 0.3s ease; /* ホバーエフェクトの滑らかな変化 */
+}
 
     .date-cell {
       display: flex;
