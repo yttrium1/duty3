@@ -1,3 +1,5 @@
+
+
 <html>
 <head>
   <meta charset="UTF-8">
@@ -33,8 +35,7 @@
       cursor: pointer;
       background-color: #fbd38d;
     }
-
-   .calendar-day {
+    .calendar-day {
       font-weight: bold;
       text-align: center;
   　　 display: flex;
@@ -74,15 +75,14 @@
       flex: 1 0 14%; /* 各日付がコンテナの幅の14%を取るように設定 */
       transition: background-color 0.3s ease; /* ホバーエフェクトの滑らかな変化 */
       border: 1px solid #bbb; /* 境界線を追加 */
-      
     /* 余白が必要な場合はmarginをここに追加 */
     }
 
     .date-cell {
       display: flex;
       justify-content: space-around;
-      flex: 1 0 14%; /* 各グリッドセルがコンテナの幅の14%を取るように設定 */
-    　border: 1px solid #bbb; /* 境界線を追加 */
+      flex: 1 0 9%; /* 各グリッドセルがコンテナの幅の14%を取るように設定 */
+      border: 1px solid #bbb; /* 境界線を追加 */
     }
     .duty, .day {
       flex: 1 0 7%; /* これにより、これらの要素は日付の半分の幅を取る */
@@ -103,64 +103,17 @@
     .date {
       transition: background-color 0.3s ease; /* ホバーエフェクトの滑らかな変化 */
     }
-    .button {
-  font-size: 18px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  display: inline-block;
-  text-align: center;
-  font-weight: bold;
-  padding: 0.7em 2em;
-  border: 3px solid #FF0072;
-  border-radius: 2px;
-  position: relative;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.1);
-  color: #FF0072;
-  text-decoration: none;
-  transition: 0.3s ease all;
-  z-index: 1;
-}
-
-.button:before {
-  transition: 0.5s all ease;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  right: 50%;
-  bottom: 0;
-  opacity: 0;
-  content: '';
-  background-color: #FF0072;
-  z-index: -1;
-}
-
-.button:hover, button:focus {
-  color: white;
-}
-
-.button:hover:before, button:focus:before {
-  transition: 0.5s all ease;
-  left: 0;
-  right: 0;
-  opacity: 1;
-}
-
-.button:active {
-  transform: scale(0.9);
-}
-
- #generate-url {
+    
+    #generate-url {
       display: inline-block;
-      background-color: #7B68EE;
+      background-color: #7B68EE
       color: white;
       font-weight: bold;
       padding: 8px 16px;
       border-radius: 9999px;
       margin-bottom: 8px;
     }
-
-    
- </style>
+  </style>
   <script>
    document.addEventListener('DOMContentLoaded', function() {
     let now = new Date(); // 現在の日付と時刻を取得
@@ -430,7 +383,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <div class="mb-8">
       <span class="step-button">STEP 4</span>
-      <p class="text-gray-700 text-sm mt-2">コメントを追加してください（任意）休日で，日直のみ　または　当直のみを希望する日はこちらにコメントをお願いします．例）「17は当直のみ×です」など．現在ボタンを変更できないか開発中です．お手数をおかけしますがよろしくお願いします</p>
+      <p class="text-gray-700 text-sm mt-2">コメントを追加してください（任意）</p>
     <textarea id="comment-input" class="mt-2 p-2 border border-gray-300 rounded w-full" placeholder="コメント"></textarea>
     </div>
     <div class="mb-8">
@@ -438,12 +391,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <input type="email" id="email-input" name="email" placeholder="your.email@example.com" class="mt-1 p-2 border border-gray-300 rounded w-full">
     </div>
     <div>
- <button id="generate-url" class="button">送信する</button>
-
-  <p class="text-gray-700 text-sm mt-2">（ボタンを押した後，完了まで数秒かかります．）</p>
-</div>
-  <iframe src="https://repo5.com/tool/freecounter/counter.cgi?ID=WGYMVYMJXB" width=80px height=24px frameborder=0></iframe>
-
-  </div> <!-- ここでcontainerクラスが終了します -->
+      <button id="generate-url" class="bg-green-600 text-white font-bold py-2 px-4 rounded-full">送信する</button>
+            <p class="text-gray-700 text-sm mt-2">（ボタンを押した後，完了まで数秒かかります．）</p>
+    </div>
+  </div>
 </body>
 </html>
