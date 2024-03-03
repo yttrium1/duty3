@@ -34,9 +34,7 @@
       background-color: #fbd38d;
     }
 
-    .calendar th,.calendar td{font-size:15px;border:1px solid #bbb;text-align:center;line-height:30px}
-    
-    .calendar-day {
+   .calendar-day {
       font-weight: bold;
       text-align: center;
   　　 display: flex;
@@ -75,6 +73,8 @@
       text-align: center;
       flex: 1 0 14%; /* 各日付がコンテナの幅の14%を取るように設定 */
       transition: background-color 0.3s ease; /* ホバーエフェクトの滑らかな変化 */
+      border: 1px solid #bbb; /* 境界線を追加 */
+      
     /* 余白が必要な場合はmarginをここに追加 */
     }
 
@@ -82,6 +82,7 @@
       display: flex;
       justify-content: space-around;
       flex: 1 0 14%; /* 各グリッドセルがコンテナの幅の14%を取るように設定 */
+    　border: 1px solid #bbb; /* 境界線を追加 */
     }
     .duty, .day {
       flex: 1 0 7%; /* これにより、これらの要素は日付の半分の幅を取る */
