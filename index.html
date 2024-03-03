@@ -106,28 +106,24 @@
   position: relative;
   padding: 10px 20px;
   border-radius: 7px;
-  border: 1px solid rgb(61, 106, 255); /* 枠の色はそのまま */
+  border: 1px solid rgb(61, 106, 255); /* 枠の色 */
   font-size: 14px;
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 2px;
-  background: rgb(61, 106, 255); /* 背景色を青に */
-  color: #fff; /* 文字色は白 */
+  background: rgb(61, 106, 255); /* デフォルトの背景色を青に */
+  color: #fff; /* デフォルトの文字色は白 */
   overflow: hidden;
-  box-shadow: 0 0 0 0 transparent;
-  transition: all 0.2s ease-in;
+  box-shadow: 0 0 30px 5px rgba(0, 142, 236, 0.815); /* デフォルト状態でのシャドウ */
+  transition: all 0.2s ease-in-out;
 }
 #generate-url:hover {
- background: transparent; /* 背景を透明に */
-  color: rgb(61, 106, 255); /* ホバー時の文字色を青に */
-  box-shadow: 0 0 30px 5px rgba(0, 142, 236, 0.815); /* ホバー時のエフェクトを調整 */
-  transition: all 0.2s ease-out;}
+ background: transparent; /* ホバー時の背景を透明に */
+  color: rgb(61, 106, 255); /* ホバー時の文字色を青に（背景が透明なので見えるように） */
+  box-shadow: 0 0 0 0 transparent; /* ホバー時のシャドウを削除 */}
 
 #generate-url:hover::before {
-   -webkit-animation: sh02 0.5s 0s linear;
-  -moz-animation: sh02 0.5s 0s linear;
-  animation: sh02 0.5s 0s linear;
-}
+animation: none; /* ホバー時のアニメーションを無効化（必要に応じて） */}
 
 #generate-url::before {
  content: '';
