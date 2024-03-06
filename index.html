@@ -101,6 +101,17 @@
       transition: background-color 0.3s ease; /* ホバーエフェクトの滑らかな変化 */
     }
     
+    .container1 {
+  width: 100%;
+  height: 100%;
+  /* Add your background pattern here */
+  background-color: #ffffff;
+  background-image: radial-gradient(rgba(12, 12, 12, 0.171) 2px, transparent 0);
+  background-size: 30px 30px;
+  background-position: -5px -5px;
+}
+
+    
     #page {
   display: flex;
   justify-content: center;
@@ -401,6 +412,15 @@ box-shadow: 0 0 0 0 transparent;
     <div class="text-right mb-4">
       <span class="text-lg font-semibold">内科当直希望</span>
     </div>
+  <div id="page">
+        <div id="container">
+            <div id="ring"></div>
+            <div id="ring"></div>
+            <div id="ring"></div>
+            <div id="ring"></div>
+            <div id="h3">loading</div>
+        </div>
+  <div class="container1"></div>
 
   <div class="mb-8">
   <span class="step-button">STEP 1</span>
@@ -535,14 +555,6 @@ document.addEventListener('DOMContentLoaded', function() {
      <button id="generate-url">送信する</button>
     </div>
   </div>
-  <div id="page">
-        <div id="container">
-            <div id="ring"></div>
-            <div id="ring"></div>
-            <div id="ring"></div>
-            <div id="ring"></div>
-            <div id="h3">loading</div>
-        </div>
 </div>
 </body>
 </html>
