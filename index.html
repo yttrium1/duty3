@@ -62,7 +62,7 @@
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
     <script>
         const liffId = '2006692584-PX48YKoN';
-        const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/api/get-status';
+        const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev';
         
         let isInitialized = false;
 
@@ -72,13 +72,11 @@
                 isInitialized = true;
                 console.log('LIFF初期化成功');
                 
-                // ログイン状態チェック
                 if (!liff.isLoggedIn()) {
                     console.log('ユーザーが未ログイン');
                     await liff.login();
                 }
 
-                // 初期状態の取得
                 await fetchStatus();
                 
             } catch (err) {
@@ -96,15 +94,17 @@
 
         async function fetchStatus() {
             try {
-                const response = await fetch(serverUrl);
+                const response = await fetch(`${serverUrl}/api/get-status`);
                 const data = await response.json();
                 if (!response.ok) {
                     throw new Error(data.message || 'ステータス取得に失敗しました');
                 }
                 showStatus(`現在の在庫数: ${data.stock}個`);
+                return data;
             } catch (error) {
                 console.error('ステータス取得エラー:', error);
                 showStatus('在庫情報の取得に失敗しました', 'error');
+                return null;
             }
         }
 
@@ -119,33 +119,31 @@
             document.body.classList.add('loading');
             
             try {
-                // プロフィール取得を試みる
                 const profile = await liff.getProfile();
-                const userId = profile.userId;
-                console.log('UserID:', userId);
+                console.log('Profile取得成功:', profile);
 
-                const response = await fetch(`${serverUrl}/api/take-bento`, {
+                const response = await fetch(`${serverUrl}/api/get-bento`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${liff.getAccessToken()}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ 
-                        userId,
-                        displayName: profile.displayName 
+                        userId: profile.userId,
+                        displayName: profile.displayName
                     })
                 });
 
                 const data = await response.json();
+                console.log('API応答:', data);
 
                 if (!response.ok) {
                     throw new Error(data.message || 'エラーが発生しました');
                 }
 
                 const statusMessage = `
-                    <p>${data.message}</p>
+                    <p>${data.message || '弁当を受け取りました'}</p>
                     <p>現在の在庫: ${data.stock}個</p>
-                    ${data.logEntry ? `<p>取得日時: ${new Date(data.logEntry.takenAt).toLocaleString()}</p>` : ''}
+                    ${data.timestamp ? `<p>取得日時: ${new Date(data.timestamp).toLocaleString()}</p>` : ''}
                 `;
                 showStatus(statusMessage);
 
@@ -162,10 +160,7 @@
             }
         });
 
-        // 初期化の実行
         initializeLiff();
-
-        // 5分ごとに在庫状況を更新
         setInterval(fetchStatus, 300000);
     </script>
 </body>
