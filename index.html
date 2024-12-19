@@ -122,7 +122,7 @@ document.getElementById('getBentoBtn').addEventListener('click', async () => {
 
         showDebug('弁当取得リクエスト送信', requestBody);
 
-        const response = await fetch(`${serverUrl}/api/take-bento`, {
+        const response = await fetch(`${serverUrl}/api/get-status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
