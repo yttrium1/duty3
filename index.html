@@ -1,19 +1,18 @@
 <script>
-    const liffId = '2006692584-PX48YKoN'; // LINE Developersコンソールで取得したLIFF ID
-    const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/api/get-status';
+    const liffId = '2006692584-PX48YKoN';
+    const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev';
 
     async function initializeLiff() {
         try {
             await liff.init({ liffId });
             console.log('LIFF初期化成功');
 
-            // ユーザーが未ログインの場合はログイン
             if (!liff.isLoggedIn()) {
                 liff.login();
             }
         } catch (err) {
             console.error('LIFF初期化エラー:', err);
-            showStatus('アプリの初期化に失敗しました。', 'error');
+            showStatus(`LIFF初期化に失敗しました: ${err.message}`, 'error');
         }
     }
 
@@ -43,7 +42,6 @@
             const data = await response.json();
 
             if (!response.ok) {
-                console.error('サーバーレスポンスエラー:', data);
                 throw new Error(data.message || 'エラーが発生しました');
             }
 
