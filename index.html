@@ -1,63 +1,172 @@
-<script>
-    const liffId = '2006692584-PX48YKoN';
-    const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/api/get-status';
-
-    async function initializeLiff() {
-        try {
-            await liff.init({ liffId });
-            console.log('LIFF初期化成功');
-
-            if (!liff.isLoggedIn()) {
-                liff.login();
-            }
-        } catch (err) {
-            console.error('LIFF初期化エラー:', err);
-            showStatus(`LIFF初期化に失敗しました: ${err.message}`, 'error');
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>弁当管理LIFF</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
-    }
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #00B900;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #009900;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #e7f7e7;
+            border: 1px solid #c3e6c3;
+        }
+        .error {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+        }
+        .loading {
+            position: relative;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>弁当受け取り</h1>
+    <p>「弁当を受け取る」ボタンを押すと在庫数が減り、あなたの取得記録が残ります。</p>
+    <button id="getBentoBtn">弁当を受け取る</button>
+    <div id="status"></div>
 
-    function showStatus(message, type = 'success') {
-        const statusDiv = document.getElementById('status');
-        statusDiv.className = type;
-        statusDiv.innerHTML = `<p>${message}</p>`;
-    }
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+    <script>
+        const liffId = '2006692584-PX48YKoN';
+        const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/api/get-status';
+        
+        let isInitialized = false;
 
-    document.getElementById('getBentoBtn').addEventListener('click', async () => {
-        const button = document.getElementById('getBentoBtn');
-        button.disabled = true;
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId });
+                isInitialized = true;
+                console.log('LIFF初期化成功');
+                
+                // ログイン状態チェック
+                if (!liff.isLoggedIn()) {
+                    console.log('ユーザーが未ログイン');
+                    await liff.login();
+                }
 
-        try {
-            const profile = await liff.getProfile();
-            const userId = profile.userId;
-            console.log('UserID:', userId);
+                // 初期状態の取得
+                await fetchStatus();
+                
+            } catch (err) {
+                console.error('LIFF初期化エラー:', err);
+                showStatus(`アプリケーションの初期化に失敗しました: ${err.message}`, 'error');
+                document.getElementById('getBentoBtn').disabled = true;
+            }
+        }
 
-            const response = await fetch(`${serverUrl}/api/take-bento`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ userId })
-            });
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = type;
+            statusDiv.innerHTML = `<p>${message}</p>`;
+        }
 
-            const data = await response.json();
+        async function fetchStatus() {
+            try {
+                const response = await fetch(serverUrl);
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'ステータス取得に失敗しました');
+                }
+                showStatus(`現在の在庫数: ${data.stock}個`);
+            } catch (error) {
+                console.error('ステータス取得エラー:', error);
+                showStatus('在庫情報の取得に失敗しました', 'error');
+            }
+        }
 
-            if (!response.ok) {
-                throw new Error(data.message || 'エラーが発生しました');
+        document.getElementById('getBentoBtn').addEventListener('click', async () => {
+            if (!isInitialized) {
+                showStatus('アプリケーションが初期化されていません', 'error');
+                return;
             }
 
-            const statusMessage = `
-                <p>${data.message}</p>
-                <p>現在の在庫: ${data.stock}個</p>
-                ${data.logEntry ? `<p>取得日時: ${new Date(data.logEntry.takenAt).toLocaleString()}</p>` : ''}
-            `;
-            showStatus(statusMessage);
-        } catch (error) {
-            console.error('エラー:', error);
-            showStatus(error.message || 'エラーが発生しました。もう一度お試しください。', 'error');
-        } finally {
-            button.disabled = false;
-        }
-    });
+            const button = document.getElementById('getBentoBtn');
+            button.disabled = true;
+            document.body.classList.add('loading');
+            
+            try {
+                // プロフィール取得を試みる
+                const profile = await liff.getProfile();
+                const userId = profile.userId;
+                console.log('UserID:', userId);
 
-    initializeLiff();
-</script>
+                const response = await fetch(`${serverUrl}/api/take-bento`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${liff.getAccessToken()}`
+                    },
+                    body: JSON.stringify({ 
+                        userId,
+                        displayName: profile.displayName 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'エラーが発生しました');
+                }
+
+                const statusMessage = `
+                    <p>${data.message}</p>
+                    <p>現在の在庫: ${data.stock}個</p>
+                    ${data.logEntry ? `<p>取得日時: ${new Date(data.logEntry.takenAt).toLocaleString()}</p>` : ''}
+                `;
+                showStatus(statusMessage);
+
+            } catch (error) {
+                console.error('エラー:', error);
+                if (error.message.includes('LIFF')) {
+                    showStatus('LINEにログインしていないか、セッションが切れています。ページを再読み込みしてください。', 'error');
+                } else {
+                    showStatus(error.message || 'エラーが発生しました。もう一度お試しください。', 'error');
+                }
+            } finally {
+                button.disabled = false;
+                document.body.classList.remove('loading');
+            }
+        });
+
+        // 初期化の実行
+        initializeLiff();
+
+        // 5分ごとに在庫状況を更新
+        setInterval(fetchStatus, 300000);
+    </script>
+</body>
+</html>
