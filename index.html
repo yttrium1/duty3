@@ -37,6 +37,8 @@
             margin-top: 20px;
             padding: 15px;
             border-radius: 4px;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
         .success {
             background-color: #e7f7e7;
@@ -46,10 +48,13 @@
             background-color: #ffebee;
             border: 1px solid #ffcdd2;
         }
-        .loading {
-            position: relative;
-            opacity: 0.6;
-            pointer-events: none;
+        #debug {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            font-size: 12px;
+            display: none;
         }
     </style>
 </head>
@@ -58,30 +63,42 @@
     <p>「弁当を受け取る」ボタンを押すと在庫数が減り、あなたの取得記録が残ります。</p>
     <button id="getBentoBtn">弁当を受け取る</button>
     <div id="status"></div>
+    <div id="debug"></div>
 
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
     <script>
         const liffId = '2006692584-PX48YKoN';
         const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev';
+        const debugDiv = document.getElementById('debug');
         
-        let isInitialized = false;
+        // デバッグ情報表示用関数
+        function showDebug(message, data = null) {
+            debugDiv.style.display = 'block';
+            const timestamp = new Date().toLocaleTimeString();
+            const debugMessage = data 
+                ? `[${timestamp}] ${message}\n${JSON.stringify(data, null, 2)}\n\n` 
+                : `[${timestamp}] ${message}\n\n`;
+            debugDiv.textContent += debugMessage;
+            console.log(message, data);
+        }
 
         async function initializeLiff() {
             try {
                 await liff.init({ liffId });
-                isInitialized = true;
-                console.log('LIFF初期化成功');
+                showDebug('LIFF初期化成功');
                 
                 if (!liff.isLoggedIn()) {
-                    console.log('ユーザーが未ログイン');
-                    await liff.login();
+                    showDebug('ログインが必要です');
+                    liff.login();
+                    return;
                 }
 
-                await fetchStatus();
+                const profile = await liff.getProfile();
+                showDebug('プロフィール取得成功', profile);
                 
             } catch (err) {
-                console.error('LIFF初期化エラー:', err);
-                showStatus(`アプリケーションの初期化に失敗しました: ${err.message}`, 'error');
+                showDebug('LIFF初期化エラー', err);
+                showStatus(`初期化エラー: ${err.message}`, 'error');
                 document.getElementById('getBentoBtn').disabled = true;
             }
         }
@@ -89,79 +106,61 @@
         function showStatus(message, type = 'success') {
             const statusDiv = document.getElementById('status');
             statusDiv.className = type;
-            statusDiv.innerHTML = `<p>${message}</p>`;
-        }
-
-        async function fetchStatus() {
-            try {
-                const response = await fetch(`${serverUrl}/api/get-status`);
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.message || 'ステータス取得に失敗しました');
-                }
-                showStatus(`現在の在庫数: ${data.stock}個`);
-                return data;
-            } catch (error) {
-                console.error('ステータス取得エラー:', error);
-                showStatus('在庫情報の取得に失敗しました', 'error');
-                return null;
-            }
+            statusDiv.textContent = message;
         }
 
         document.getElementById('getBentoBtn').addEventListener('click', async () => {
-            if (!isInitialized) {
-                showStatus('アプリケーションが初期化されていません', 'error');
-                return;
-            }
-
             const button = document.getElementById('getBentoBtn');
             button.disabled = true;
-            document.body.classList.add('loading');
             
             try {
                 const profile = await liff.getProfile();
-                console.log('Profile取得成功:', profile);
+                showDebug('プロフィール情報', profile);
 
-                const response = await fetch(`${serverUrl}/api/get-bento`, {
+                // ステータス取得
+                showDebug('ステータス取得開始');
+                const statusResponse = await fetch(`${serverUrl}/api/get-status`);
+                const statusData = await statusResponse.json();
+                showDebug('ステータス取得結果', statusData);
+
+                // 弁当取得リクエスト
+                const requestBody = { 
+                    userId: profile.userId,
+                    displayName: profile.displayName 
+                };
+                showDebug('リクエスト内容', requestBody);
+
+                const response = await fetch(`${serverUrl}/api/get-status`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ 
-                        userId: profile.userId,
-                        displayName: profile.displayName
-                    })
+                    body: JSON.stringify(requestBody)
                 });
 
-                const data = await response.json();
-                console.log('API応答:', data);
+                const responseData = await response.json();
+                showDebug('サーバーレスポンス', responseData);
 
                 if (!response.ok) {
-                    throw new Error(data.message || 'エラーが発生しました');
+                    throw new Error(responseData.message || 'サーバーエラーが発生しました');
                 }
 
-                const statusMessage = `
-                    <p>${data.message || '弁当を受け取りました'}</p>
-                    <p>現在の在庫: ${data.stock}個</p>
-                    ${data.timestamp ? `<p>取得日時: ${new Date(data.timestamp).toLocaleString()}</p>` : ''}
-                `;
-                showStatus(statusMessage);
+                showStatus(`
+                    処理成功
+                    現在の在庫: ${responseData.stock}個
+                    ${responseData.timestamp ? `\n取得日時: ${new Date(responseData.timestamp).toLocaleString()}` : ''}
+                `);
 
             } catch (error) {
-                console.error('エラー:', error);
-                if (error.message.includes('LIFF')) {
-                    showStatus('LINEにログインしていないか、セッションが切れています。ページを再読み込みしてください。', 'error');
-                } else {
-                    showStatus(error.message || 'エラーが発生しました。もう一度お試しください。', 'error');
-                }
+                showDebug('エラー発生', error);
+                showStatus(error.message || 'エラーが発生しました。もう一度お試しください。', 'error');
             } finally {
                 button.disabled = false;
-                document.body.classList.remove('loading');
             }
         });
 
+        // 初期化実行
         initializeLiff();
-        setInterval(fetchStatus, 300000);
     </script>
 </body>
 </html>
