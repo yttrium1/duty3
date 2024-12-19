@@ -35,8 +35,7 @@
             const response = await fetch(`${serverUrl}/api/take-bento`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${liff.getAccessToken()}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ userId })
             });
@@ -44,6 +43,7 @@
             const data = await response.json();
 
             if (!response.ok) {
+                console.error('サーバーレスポンスエラー:', data);
                 throw new Error(data.message || 'エラーが発生しました');
             }
 
