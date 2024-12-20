@@ -61,8 +61,8 @@
     </style>
 </head>
 <body>
-    <h1>弁当受け取り</h1>
-    <p>「弁当を受け取る」ボタンを押すと在庫数が減り、あなたの取得記録が残ります。</p>
+    <h1>弁当管理</h1>
+    <p>現在の弁当の在庫を確認したり、受け取った記録を管理します。</p>
     <button id="getBentoBtn">弁当を受け取る</button>
     <div id="status"></div>
     <div id="debug"></div>
@@ -71,11 +71,10 @@
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 
     <script>
-        const liffId = '2006692584-PX48YKoN'; // あなたのLIFF IDに置き換えてください
-        const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/api/get-status'; // あなたのバックエンドURL
+        const liffId = '2006692584-PX48YKoN';
+        const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev';
         const debugDiv = document.getElementById('debug');
 
-        // デバッグ情報表示用関数
         function showDebug(message, data = null) {
             debugDiv.style.display = 'block';
             const timestamp = new Date().toLocaleTimeString();
@@ -100,12 +99,11 @@
                 if (!liff.isLoggedIn()) {
                     showDebug('未ログインのためログインします');
                     liff.login();
-                    return; // ログイン後にページ再読み込みされ、再度initializeLiff()が呼ばれます
+                    return;
                 }
 
                 const profile = await liff.getProfile();
                 showDebug('プロフィール取得成功', profile);
-
                 showStatus('準備完了！「弁当を受け取る」ボタンを押してください。', 'success');
 
             } catch (err) {
@@ -161,7 +159,6 @@
             }
         });
 
-        // 初期化実行
         initializeLiff();
     </script>
 </body>
