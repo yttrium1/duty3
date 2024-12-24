@@ -33,6 +33,9 @@
             background-color: #cccccc;
             cursor: not-allowed;
         }
+        #bentoStock {
+            transition: background-color 0.5s ease;
+        }
         #status {
             margin-top: 20px;
             padding: 15px;
@@ -60,11 +63,11 @@
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 
     <script>
-        const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev; // ReplitのURLを指定
+        const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev';
 
-        // 在庫情報を取得して表示
         async function fetchStock() {
             const bentoStockElement = document.getElementById('bentoStock');
+            const statusElement = document.getElementById('status');
             try {
                 const response = await fetch(`${serverUrl}/api/get-status`);
                 if (!response.ok) {
@@ -72,15 +75,23 @@
                 }
                 const data = await response.json();
                 bentoStockElement.textContent = `現在の在庫: ${data.stock}個`;
+                bentoStockElement.style.backgroundColor = '#e7f7e7'; // 成功時の背景色
+                setTimeout(() => {
+                    bentoStockElement.style.backgroundColor = ''; // 元の色に戻す
+                }, 1000);
+                statusElement.textContent = '在庫情報を正常に更新しました。';
+                statusElement.className = 'success';
             } catch (error) {
                 bentoStockElement.textContent = '在庫情報を取得できません。';
+                statusElement.textContent = `エラー: ${error.message}`;
+                statusElement.className = 'error';
                 console.error('在庫情報の取得エラー:', error);
             }
         }
 
-        // 弁当を受け取る処理
         document.getElementById('getBentoBtn').addEventListener('click', async () => {
             const button = document.getElementById('getBentoBtn');
+            const statusElement = document.getElementById('status');
             button.disabled = true;
 
             try {
@@ -89,7 +100,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ userId: 'sample-user-id' }) // ユーザーIDを適宜修正
+                    body: JSON.stringify({ userId: 'sample-user-id' })
                 });
 
                 if (!response.ok) {
@@ -98,12 +109,14 @@
 
                 const data = await response.json();
                 alert(`弁当を受け取りました！\n現在の在庫: ${data.stock}個`);
+                fetchStock(); // 在庫情報を再取得
 
-                // 在庫情報を再取得して更新
-                fetchStock();
-
+                statusElement.textContent = '弁当を正常に受け取りました。';
+                statusElement.className = 'success';
             } catch (error) {
                 alert('エラーが発生しました。もう一度お試しください。');
+                statusElement.textContent = `エラー: ${error.message}`;
+                statusElement.className = 'error';
                 console.error('弁当受け取りエラー:', error);
             } finally {
                 button.disabled = false;
