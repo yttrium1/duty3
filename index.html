@@ -63,68 +63,78 @@
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 
     <script>
-        const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/';
+    const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/';
+    let userProfile = null;
 
-        async function fetchStock() {
-            const bentoStockElement = document.getElementById('bentoStock');
-            const statusElement = document.getElementById('status');
-            try {
-                const response = await fetch(`${serverUrl}/api/get-status`);
-                if (!response.ok) {
-                    throw new Error(`HTTPエラー: ${response.status}`);
-                }
-                const data = await response.json();
-                bentoStockElement.textContent = `現在の在庫: ${data.stock}個`;
-                bentoStockElement.style.backgroundColor = '#e7f7e7'; // 成功時の背景色
-                setTimeout(() => {
-                    bentoStockElement.style.backgroundColor = ''; // 元の色に戻す
-                }, 1000);
-                statusElement.textContent = '在庫情報を正常に更新しました。';
-                statusElement.className = 'success';
-            } catch (error) {
-                bentoStockElement.textContent = '在庫情報を取得できません。';
-                statusElement.textContent = `エラー: ${error.message}`;
-                statusElement.className = 'error';
-                console.error('在庫情報の取得エラー:', error);
+    // LIFF初期化とログイン
+    async function initLiff() {
+        try {
+            await liff.init({ liffId: 'YOUR_LIFF_ID' }); // LIFF IDを設定
+            if (!liff.isLoggedIn()) {
+                liff.login();
             }
+            userProfile = await liff.getProfile();
+            document.getElementById('status').textContent = `ようこそ、${userProfile.displayName}さん！`;
+        } catch (error) {
+            console.error('LIFF初期化エラー:', error);
+            document.getElementById('status').textContent = 'LIFF初期化に失敗しました。';
         }
+    }
 
-        document.getElementById('getBentoBtn').addEventListener('click', async () => {
-            const button = document.getElementById('getBentoBtn');
-            const statusElement = document.getElementById('status');
-            button.disabled = true;
-
-            try {
-                const response = await fetch(`${serverUrl}/api/take-bento`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: 'sample-user-id' })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTPエラー: ${response.status}`);
-                }
-
-                const data = await response.json();
-                alert(`弁当を受け取りました！\n現在の在庫: ${data.stock}個`);
-                fetchStock(); // 在庫情報を再取得
-
-                statusElement.textContent = '弁当を正常に受け取りました。';
-                statusElement.className = 'success';
-            } catch (error) {
-                alert('エラーが発生しました。もう一度お試しください。');
-                statusElement.textContent = `エラー: ${error.message}`;
-                statusElement.className = 'error';
-                console.error('弁当受け取りエラー:', error);
-            } finally {
-                button.disabled = false;
+    // 弁当受け取り履歴の表示
+    async function fetchHistory() {
+        try {
+            const response = await fetch(`${serverUrl}api/get-status`);
+            if (!response.ok) {
+                throw new Error(`HTTPエラー: ${response.status}`);
             }
-        });
+            const data = await response.json();
+            const historyElement = document.getElementById('history');
+            historyElement.innerHTML = ''; // 履歴をクリア
+            data.recentLogs.forEach(log => {
+                const logItem = document.createElement('p');
+                logItem.textContent = `${log.userId} が ${log.takenAt} に弁当を受け取りました。`;
+                historyElement.appendChild(logItem);
+            });
+        } catch (error) {
+            console.error('履歴取得エラー:', error);
+        }
+    }
 
-        // ページ読み込み時に在庫情報を取得
-        fetchStock();
-    </script>
+    // 弁当を受け取る処理
+    document.getElementById('getBentoBtn').addEventListener('click', async () => {
+        const button = document.getElementById('getBentoBtn');
+        button.disabled = true;
+
+        try {
+            const response = await fetch(`${serverUrl}api/take-bento`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: userProfile?.userId || '不明なユーザー',
+                    userName: userProfile?.displayName || '匿名',
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTPエラー: ${response.status}`);
+            }
+
+            const data = await response.json();
+            alert(`弁当を受け取りました！現在の在庫: ${data.stock}個`);
+            fetchHistory(); // 履歴を更新
+        } catch (error) {
+            console.error('弁当受け取りエラー:', error);
+            alert('エラーが発生しました。もう一度お試しください。');
+        } finally {
+            button.disabled = false;
+        }
+    });
+
+    // 初期化と履歴取得
+    initLiff();
+    fetchHistory();
+</script>
+
 </body>
 </html>
