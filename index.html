@@ -34,7 +34,11 @@
             cursor: not-allowed;
         }
         #bentoStock {
-            transition: background-color 0.5s ease;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         #status {
             margin-top: 20px;
@@ -60,7 +64,10 @@
 </head>
 <body>
     <h1>弁当管理</h1>
-    <p id="bentoStock">現在の在庫: 読み込み中...</p>
+    <div id="bentoStock">
+        <h2>現在の弁当在庫</h2>
+        <ul id="bentoList">読み込み中...</ul>
+    </div>
     <div id="history"></div> <!-- 履歴の表示領域 -->
     <button id="getBentoBtn">弁当を受け取る</button>
     <div id="status"></div>
@@ -80,7 +87,6 @@
                 liff.login();
             }
             userProfile = await liff.getProfile();
-            console.log('取得したユーザープロフィール:', userProfile);
             document.getElementById('status').textContent = `ようこそ、${userProfile.displayName}さん！`;
         } catch (error) {
             console.error('LIFF初期化エラー:', error);
@@ -90,21 +96,22 @@
 
     // 在庫情報の取得
     async function fetchStock() {
-        const bentoStockElement = document.getElementById('bentoStock');
-        const statusElement = document.getElementById('status');
+        const bentoListElement = document.getElementById('bentoList');
         try {
             const response = await fetch(`${serverUrl}api/get-status`);
             if (!response.ok) {
                 throw new Error(`HTTPエラー: ${response.status}`);
             }
             const data = await response.json();
-            bentoStockElement.textContent = `現在の在庫: ${data.stock}個`;
-            statusElement.textContent = '在庫情報を正常に更新しました。';
-            statusElement.className = 'success';
+
+            bentoListElement.innerHTML = ''; // 一度クリア
+            data.bentoStock.forEach((bento) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${bento.bentoName}: ${bento.stock}個`;
+                bentoListElement.appendChild(listItem);
+            });
         } catch (error) {
-            bentoStockElement.textContent = '在庫情報を取得できません。';
-            statusElement.textContent = `エラー: ${error.message}`;
-            statusElement.className = 'error';
+            bentoListElement.innerHTML = '<li>在庫情報を取得できません。</li>';
             console.error('在庫情報の取得エラー:', error);
         }
     }
@@ -131,16 +138,10 @@
                     second: '2-digit',
                 });
 
-                // 表示用のフォーマット
                 const logItem = document.createElement('div');
                 logItem.style.borderBottom = '1px solid #ddd';
                 logItem.style.padding = '10px 0';
-
-                logItem.innerHTML = `
-                    <strong>${index + 1}.</strong> <span style="color: #333;">${userName} さん</span>
-                    <br>
-                    <small style="color: #666;">${formattedDate}</small>
-                `;
+                logItem.innerHTML = `<strong>${index + 1}.</strong> ${userName} さん<br><small>${formattedDate}</small>`;
                 historyElement.appendChild(logItem);
             });
         } catch (error) {
@@ -192,7 +193,6 @@
     }
 
     initLiffAndFetchData();
-</script>
-
+    </script>
 </body>
 </html>
