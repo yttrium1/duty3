@@ -1,4 +1,74 @@
-<script>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>弁当管理LIFF</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #00B900;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #009900;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #bentoStock {
+            transition: background-color 0.5s ease;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        #history {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .success {
+            background-color: #e7f7e7;
+            border: 1px solid #c3e6c3;
+        }
+        .error {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+        }
+    </style>
+</head>
+<body>
+    <h1>弁当管理</h1>
+    <p id="bentoStock">現在の在庫: 読み込み中...</p>
+    <div id="history"></div> <!-- 履歴の表示領域 -->
+    <button id="getBentoBtn">弁当を受け取る</button>
+    <div id="status"></div>
+
+    <!-- LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+
+    <script>
     const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/';
     let userProfile = null;
 
@@ -123,3 +193,6 @@
 
     initLiffAndFetchData();
 </script>
+
+</body>
+</html>
