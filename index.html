@@ -68,7 +68,10 @@
         <h2>現在の弁当在庫</h2>
         <ul id="bentoList">読み込み中...</ul>
     </div>
-    <div id="history"></div> <!-- 履歴の表示領域 -->
+    <div id="history">
+        <h2>受け取り履歴</h2>
+        <div id="historyContent">読み込み中...</div>
+    </div>
     <button id="getBentoBtn">弁当を受け取る</button>
     <div id="status"></div>
 
@@ -76,7 +79,7 @@
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 
     <script>
-    const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/';
+    const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev'; // サーバーURL
     let userProfile = null;
 
     // LIFF初期化とログイン
@@ -98,7 +101,7 @@
     async function fetchStock() {
         const bentoListElement = document.getElementById('bentoList');
         try {
-            const response = await fetch(`${serverUrl}api/get-status`);
+            const response = await fetch(`${serverUrl}/api/get-status`);
             if (!response.ok) {
                 throw new Error(`HTTPエラー: ${response.status}`);
             }
@@ -118,14 +121,14 @@
 
     // 履歴の取得と表示
     async function fetchHistory() {
-        const historyElement = document.getElementById('history');
+        const historyContent = document.getElementById('historyContent');
         try {
-            const response = await fetch(`${serverUrl}api/get-status`);
+            const response = await fetch(`${serverUrl}/api/get-status`);
             if (!response.ok) {
                 throw new Error(`HTTPエラー: ${response.status}`);
             }
             const data = await response.json();
-            historyElement.innerHTML = ''; // 履歴をクリア
+            historyContent.innerHTML = ''; // 履歴をクリア
 
             data.recentLogs.forEach((log, index) => {
                 const userName = log.userName || '匿名'; // 名前または「匿名」
@@ -142,10 +145,10 @@
                 logItem.style.borderBottom = '1px solid #ddd';
                 logItem.style.padding = '10px 0';
                 logItem.innerHTML = `<strong>${index + 1}.</strong> ${userName} さん<br><small>${formattedDate}</small>`;
-                historyElement.appendChild(logItem);
+                historyContent.appendChild(logItem);
             });
         } catch (error) {
-            historyElement.innerHTML = '<p>履歴を取得できません。</p>';
+            historyContent.innerHTML = '<p>履歴を取得できません。</p>';
             console.error('履歴取得エラー:', error);
         }
     }
@@ -156,7 +159,7 @@
         button.disabled = true;
 
         try {
-            const response = await fetch(`${serverUrl}api/take-bento`, {
+            const response = await fetch(`${serverUrl}/api/take-bento`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -171,8 +174,8 @@
 
             const data = await response.json();
             alert(`弁当を受け取りました！現在の在庫: ${data.stock}個`);
-            fetchStock();
-            fetchHistory();
+            await fetchStock();
+            await fetchHistory();
         } catch (error) {
             console.error('弁当受け取りエラー:', error);
             alert('エラーが発生しました。もう一度お試しください。');
