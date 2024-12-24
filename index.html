@@ -122,8 +122,8 @@
                 const data = await response.json();
                 historyElement.innerHTML = ''; // 履歴をクリア
         
-                data.recentLogs.forEach(log => {
-                    const userName = log.userId || '匿名'; // 名前または「匿名」
+                data.recentLogs.forEach((log, index) => {
+                    const userName = log.userName || '匿名'; // 名前または「匿名」
                     const formattedDate = new Date(log.takenAt).toLocaleString('ja-JP', {
                         year: 'numeric',
                         month: '2-digit',
@@ -134,8 +134,15 @@
                     });
         
                     // 表示用のフォーマット
-                    const logItem = document.createElement('p');
-                    logItem.textContent = `${userName} さんが ${formattedDate} に弁当を受け取りました。`;
+                    const logItem = document.createElement('div');
+                    logItem.style.borderBottom = '1px solid #ddd';
+                    logItem.style.padding = '10px 0';
+        
+                    logItem.innerHTML = `
+                        <strong>${index + 1}.</strong> <span style="color: #333;">${userName} さん</span>
+                        <br>
+                        <small style="color: #666;">${formattedDate}</small>
+                    `;
                     historyElement.appendChild(logItem);
                 });
             } catch (error) {
@@ -143,6 +150,7 @@
                 console.error('履歴取得エラー:', error);
             }
         }
+
 
 
         // 弁当受け取り処理
