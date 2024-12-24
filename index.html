@@ -43,6 +43,11 @@
             white-space: pre-wrap;
             word-break: break-all;
         }
+        #history {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
         .success {
             background-color: #e7f7e7;
             border: 1px solid #c3e6c3;
@@ -56,6 +61,7 @@
 <body>
     <h1>弁当管理</h1>
     <p id="bentoStock">現在の在庫: 読み込み中...</p>
+    <div id="history"></div> <!-- 履歴の表示領域 -->
     <button id="getBentoBtn">弁当を受け取る</button>
     <div id="status"></div>
 
@@ -63,117 +69,112 @@
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 
     <script>
-    const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/';
-    let userProfile = null;
+        const serverUrl = 'https://688eca87-9817-447e-ac73-bfe4df7d0c85-00-2es7no9v6pfu4.sisko.replit.dev/';
+        let userProfile = null;
 
-    // LIFF初期化とログイン
-    async function initLiff() {
-        try {
-            await liff.init({ liffId: '2006692584-PX48YKoN' }); // LIFF IDを設定
-            if (!liff.isLoggedIn()) {
-                liff.login();
+        // LIFF初期化とログイン
+        async function initLiff() {
+            try {
+                await liff.init({ liffId: '2006692584-PX48YKoN' }); // LIFF IDを設定
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                }
+                userProfile = await liff.getProfile();
+                document.getElementById('status').textContent = `ようこそ、${userProfile.displayName}さん！`;
+            } catch (error) {
+                console.error('LIFF初期化エラー:', error);
+                document.getElementById('status').textContent = 'LIFF初期化に失敗しました。';
             }
-            userProfile = await liff.getProfile();
-            document.getElementById('status').textContent = `ようこそ、${userProfile.displayName}さん！`;
-        } catch (error) {
-            console.error('LIFF初期化エラー:', error);
-            document.getElementById('status').textContent = 'LIFF初期化に失敗しました。';
         }
-    }
 
-    // 在庫情報の取得
-    async function fetchStock() {
-        const bentoStockElement = document.getElementById('bentoStock');
-        const statusElement = document.getElementById('status');
-        try {
-            console.log('在庫情報取得を開始...');
-            const response = await fetch(`${serverUrl}api/get-status`);
-            console.log('レスポンスステータス:', response.status);
+        // 在庫情報の取得
+        async function fetchStock() {
+            const bentoStockElement = document.getElementById('bentoStock');
+            const statusElement = document.getElementById('status');
+            try {
+                console.log('在庫情報取得を開始...');
+                const response = await fetch(`${serverUrl}api/get-status`);
+                if (!response.ok) {
+                    throw new Error(`HTTPエラー: ${response.status}`);
+                }
 
-            if (!response.ok) {
-                throw new Error(`HTTPエラー: ${response.status}`);
+                const data = await response.json();
+                bentoStockElement.textContent = `現在の在庫: ${data.stock}個`;
+                statusElement.textContent = '在庫情報を正常に更新しました。';
+                statusElement.className = 'success';
+            } catch (error) {
+                bentoStockElement.textContent = '在庫情報を取得できません。';
+                statusElement.textContent = `エラー: ${error.message}`;
+                statusElement.className = 'error';
+                console.error('在庫情報の取得エラー:', error);
             }
-
-            const data = await response.json();
-            console.log('在庫情報:', data);
-
-            bentoStockElement.textContent = `現在の在庫: ${data.stock}個`;
-            statusElement.textContent = '在庫情報を正常に更新しました。';
-            statusElement.className = 'success';
-        } catch (error) {
-            bentoStockElement.textContent = '在庫情報を取得できません。';
-            statusElement.textContent = `エラー: ${error.message}`;
-            statusElement.className = 'error';
-            console.error('在庫情報の取得エラー:', error);
         }
-    }
 
-    // 弁当受け取り履歴の表示
-    async function fetchHistory() {
-        try {
-            const response = await fetch(`${serverUrl}api/get-status`);
-            if (!response.ok) {
-                throw new Error(`HTTPエラー: ${response.status}`);
-            }
-            const data = await response.json();
+        // 履歴の取得
+        async function fetchHistory() {
             const historyElement = document.getElementById('history');
-            historyElement.innerHTML = ''; // 履歴をクリア
-            data.recentLogs.forEach(log => {
-                const logItem = document.createElement('p');
-                logItem.textContent = `${log.userId} が ${log.takenAt} に弁当を受け取りました。`;
-                historyElement.appendChild(logItem);
-            });
-        } catch (error) {
-            console.error('履歴取得エラー:', error);
-        }
-    }
+            try {
+                const response = await fetch(`${serverUrl}api/get-status`);
+                if (!response.ok) {
+                    throw new Error(`HTTPエラー: ${response.status}`);
+                }
 
-    // 弁当を受け取る処理
-    document.getElementById('getBentoBtn').addEventListener('click', async () => {
-        const button = document.getElementById('getBentoBtn');
-        button.disabled = true;
-
-        try {
-            const response = await fetch(`${serverUrl}api/take-bento`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: userProfile?.userId || '不明なユーザー',
-                    userName: userProfile?.displayName || '匿名',
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTPエラー: ${response.status}`);
+                const data = await response.json();
+                historyElement.innerHTML = ''; // 履歴をクリア
+                data.recentLogs.forEach(log => {
+                    const logItem = document.createElement('p');
+                    logItem.textContent = `${log.userId} が ${log.takenAt} に弁当を受け取りました。`;
+                    historyElement.appendChild(logItem);
+                });
+            } catch (error) {
+                historyElement.innerHTML = '<p>履歴を取得できません。</p>';
+                console.error('履歴取得エラー:', error);
             }
-
-            const data = await response.json();
-            alert(`弁当を受け取りました！現在の在庫: ${data.stock}個`);
-            fetchStock(); // 在庫を更新
-            fetchHistory(); // 履歴を更新
-        } catch (error) {
-            console.error('弁当受け取りエラー:', error);
-            alert('エラーが発生しました。もう一度お試しください。');
-        } finally {
-            button.disabled = false;
         }
-    });
 
-    // LIFF初期化後に在庫情報と履歴を取得
-    async function initLiffAndFetchData() {
-        try {
-            await initLiff();
-            await fetchStock();
-            await fetchHistory();
-        } catch (error) {
-            console.error('初期化またはデータ取得中のエラー:', error);
+        // 弁当受け取り処理
+        document.getElementById('getBentoBtn').addEventListener('click', async () => {
+            const button = document.getElementById('getBentoBtn');
+            button.disabled = true;
+
+            try {
+                const response = await fetch(`${serverUrl}api/take-bento`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userProfile?.userId || '不明なユーザー',
+                        userName: userProfile?.displayName || '匿名',
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTPエラー: ${response.status}`);
+                }
+
+                const data = await response.json();
+                alert(`弁当を受け取りました！現在の在庫: ${data.stock}個`);
+                fetchStock();
+                fetchHistory();
+            } catch (error) {
+                console.error('弁当受け取りエラー:', error);
+                alert('エラーが発生しました。もう一度お試しください。');
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        // 初期化とデータ取得
+        async function initLiffAndFetchData() {
+            try {
+                await initLiff();
+                await fetchStock();
+                await fetchHistory();
+            } catch (error) {
+                console.error('初期化またはデータ取得中のエラー:', error);
+            }
         }
-    }
 
-    // 初期化とデータ取得の実行
-    initLiffAndFetchData();
-</script>
-
-
+        initLiffAndFetchData();
+    </script>
 </body>
 </html>
