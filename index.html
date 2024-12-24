@@ -110,7 +110,7 @@
             }
         }
 
-        // 履歴の取得
+        // 履歴の取得と表示
         async function fetchHistory() {
             const historyElement = document.getElementById('history');
             try {
@@ -118,12 +118,24 @@
                 if (!response.ok) {
                     throw new Error(`HTTPエラー: ${response.status}`);
                 }
-
+        
                 const data = await response.json();
                 historyElement.innerHTML = ''; // 履歴をクリア
+        
                 data.recentLogs.forEach(log => {
+                    const userName = log.userId || '匿名'; // 名前または「匿名」
+                    const formattedDate = new Date(log.takenAt).toLocaleString('ja-JP', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                    });
+        
+                    // 表示用のフォーマット
                     const logItem = document.createElement('p');
-                    logItem.textContent = `${log.userId} が ${log.takenAt} に弁当を受け取りました。`;
+                    logItem.textContent = `${userName} さんが ${formattedDate} に弁当を受け取りました。`;
                     historyElement.appendChild(logItem);
                 });
             } catch (error) {
@@ -131,6 +143,7 @@
                 console.error('履歴取得エラー:', error);
             }
         }
+
 
         // 弁当受け取り処理
         document.getElementById('getBentoBtn').addEventListener('click', async () => {
