@@ -81,6 +81,33 @@
         }
     }
 
+    // 在庫情報の取得
+    async function fetchStock() {
+        const bentoStockElement = document.getElementById('bentoStock');
+        const statusElement = document.getElementById('status');
+        try {
+            console.log('在庫情報取得を開始...');
+            const response = await fetch(`${serverUrl}api/get-status`);
+            console.log('レスポンスステータス:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTPエラー: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('在庫情報:', data);
+
+            bentoStockElement.textContent = `現在の在庫: ${data.stock}個`;
+            statusElement.textContent = '在庫情報を正常に更新しました。';
+            statusElement.className = 'success';
+        } catch (error) {
+            bentoStockElement.textContent = '在庫情報を取得できません。';
+            statusElement.textContent = `エラー: ${error.message}`;
+            statusElement.className = 'error';
+            console.error('在庫情報の取得エラー:', error);
+        }
+    }
+
     // 弁当受け取り履歴の表示
     async function fetchHistory() {
         try {
@@ -122,6 +149,7 @@
 
             const data = await response.json();
             alert(`弁当を受け取りました！現在の在庫: ${data.stock}個`);
+            fetchStock(); // 在庫を更新
             fetchHistory(); // 履歴を更新
         } catch (error) {
             console.error('弁当受け取りエラー:', error);
@@ -131,10 +159,21 @@
         }
     });
 
-    // 初期化と履歴取得
-    initLiff();
-    fetchHistory();
+    // LIFF初期化後に在庫情報と履歴を取得
+    async function initLiffAndFetchData() {
+        try {
+            await initLiff();
+            await fetchStock();
+            await fetchHistory();
+        } catch (error) {
+            console.error('初期化またはデータ取得中のエラー:', error);
+        }
+    }
+
+    // 初期化とデータ取得の実行
+    initLiffAndFetchData();
 </script>
+
 
 </body>
 </html>
